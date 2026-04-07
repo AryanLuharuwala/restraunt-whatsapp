@@ -9,7 +9,10 @@
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f0f2f5; color: #1a1a1a; }
 .header { background: #075e54; color: white; padding: 12px 16px; position: sticky; top: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; }
 .header h1 { font-size: 18px; font-weight: 600; }
+.header-right { display: flex; align-items: center; gap: 8px; }
 .header .refresh { background: none; border: none; color: white; font-size: 20px; cursor: pointer; padding: 4px 8px; }
+.btn-logout { background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.3); color: white; font-size: 12px; padding: 4px 10px; border-radius: 6px; cursor: pointer; }
+.btn-logout:hover { background: rgba(255,255,255,.25); }
 
 .tabs { display: flex; background: #fff; border-bottom: 1px solid #ddd; overflow-x: auto; position: sticky; top: 44px; z-index: 99; }
 .tab { flex: 1; min-width: 70px; padding: 10px 6px; text-align: center; font-size: 12px; font-weight: 500; color: #666; border-bottom: 2px solid transparent; cursor: pointer; white-space: nowrap; }
@@ -75,13 +78,24 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 .log-line { font-family: monospace; font-size: 11px; padding: 3px 0; border-bottom: 1px solid #f5f5f5; word-break: break-all; }
 .empty { text-align: center; color: #888; padding: 40px 20px; font-size: 14px; }
 .meta { font-size: 12px; color: #888; }
+
+/* Security tab */
+.ip-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f5f5f5; font-size: 14px; font-family: monospace; }
+.ip-badge { background: #e8f5e9; color: #2e7d32; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+.ip-badge.current { background: #e3f2fd; color: #1565c0; }
+.sec-notice { background: #fff8e1; border: 1px solid #ffe082; border-radius: 8px; padding: 12px; font-size: 12px; color: #795548; margin-bottom: 12px; line-height: 1.6; }
 </style>
 </head>
 <body>
 
 <div class="header">
     <h1 id="restaurantName">Restaurant Admin</h1>
-    <button class="refresh" onclick="loadAll()">&#8635;</button>
+    <div class="header-right">
+        <button class="refresh" onclick="loadAll()">&#8635;</button>
+        <form method="POST" action="/logout" style="display:inline">
+            <button type="submit" class="btn-logout">Logout</button>
+        </form>
+    </div>
 </div>
 
 <div class="tabs">
@@ -89,6 +103,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
     <div class="tab" data-page="orders">Orders</div>
     <div class="tab" data-page="menu">Menu</div>
     <div class="tab" data-page="settings">Settings</div>
+    <div class="tab" data-page="security">Security</div>
     <div class="tab" data-page="logs">Logs</div>
 </div>
 
@@ -146,6 +161,44 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
     </div>
 </div>
 
+<div class="page" id="page-security">
+    <div class="sec-notice">
+        🔒 <b>IP Allowlist:</b> When set, only listed IPs can access this panel. Leave empty to allow any IP.<br>
+        🔑 <b>Master Password:</b> Required to change the dashboard password or IP list. On first login, it is <code>master:</code> + your chosen password.
+    </div>
+
+    <div class="card">
+        <h3>Your Current IP</h3>
+        <div style="margin-top:8px;">
+            <span id="current-ip" class="ip-badge current">loading…</span>
+            <button class="btn btn-sm btn-outline" style="margin-left:10px;" onclick="addCurrentIp()">+ Add to Allowlist</button>
+        </div>
+    </div>
+
+    <div class="card" style="margin-top:10px;">
+        <h3>IP Allowlist</h3>
+        <div id="ip-list" style="margin-top:8px;"></div>
+        <div style="display:flex;gap:6px;margin-top:12px;">
+            <input id="new-ip" placeholder="e.g. 203.0.113.45" style="flex:1;padding:8px;border:1px solid #ddd;border-radius:6px;font-size:14px;font-family:monospace;">
+            <button class="btn btn-sm btn-primary" onclick="addIpToList()">Add IP</button>
+        </div>
+        <div id="ip-save-row" style="display:none;margin-top:10px;">
+            <div class="form-group"><label>Master Password (required to save)</label><input type="password" id="ip-master"></div>
+            <button class="btn btn-primary" onclick="saveIpList()">Save IP List</button>
+            <button class="btn btn-outline" style="margin-left:8px;" onclick="cancelIpEdit()">Cancel</button>
+        </div>
+    </div>
+
+    <div class="card" style="margin-top:10px;">
+        <h3>Change Dashboard Password</h3>
+        <div class="form-group" style="margin-top:10px;"><label>Master Password</label><input type="password" id="sec-master"></div>
+        <div class="form-group"><label>New Password</label><input type="password" id="sec-new"></div>
+        <div class="form-group"><label>Confirm New Password</label><input type="password" id="sec-confirm"></div>
+        <button class="btn btn-primary" onclick="changePassword()">Update Password</button>
+        <div id="sec-msg" style="margin-top:10px;font-size:13px;"></div>
+    </div>
+</div>
+
 <div class="page" id="page-logs">
     <button class="btn btn-sm btn-outline" onclick="loadLogs()" style="margin-bottom:8px;">Refresh Logs</button>
     <div id="log-list"></div>
@@ -159,6 +212,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-
 let config = {};
 let currentFilter = '';
 let menuData = null;
+let pendingIpList = null; // working copy while editing
 
 document.querySelectorAll('.tab').forEach(t => {
     t.addEventListener('click', () => {
@@ -167,11 +221,13 @@ document.querySelectorAll('.tab').forEach(t => {
         t.classList.add('active');
         document.getElementById('page-' + t.dataset.page).classList.add('active');
         if (t.dataset.page === 'logs') loadLogs();
+        if (t.dataset.page === 'security') loadSecurity();
     });
 });
 
 async function api(path, opts = {}) {
     const res = await fetch(path, { headers: { 'Content-Type': 'application/json' }, ...opts, body: opts.body ? JSON.stringify(opts.body) : undefined });
+    if (res.status === 401) { location.href = '/login'; throw new Error('Unauthorized'); }
     return res.json();
 }
 
@@ -321,6 +377,107 @@ async function saveConfig() {
         greetingImage: document.getElementById('cfg-image').value||null,
     }});
     alert('Saved!'); loadAll();
+}
+
+// ── Security ────────────────────────────────────
+async function loadSecurity() {
+    const sec = await api('/api/security');
+    document.getElementById('current-ip').textContent = sec.currentIp;
+    pendingIpList = [...(sec.allowedIps || [])];
+    renderIpList();
+}
+
+function renderIpList() {
+    const el = document.getElementById('ip-list');
+    if (!pendingIpList.length) {
+        el.innerHTML = '<div class="empty" style="padding:10px 0;font-size:13px;">No IPs set — any IP can access.</div>';
+        return;
+    }
+    const currentIp = document.getElementById('current-ip').textContent;
+    el.innerHTML = pendingIpList.map((ip, idx) =>
+        `<div class="ip-row">
+            <span>${ip} ${ip === currentIp ? '<span class="ip-badge current">you</span>' : ''}</span>
+            <button class="btn btn-sm btn-danger" onclick="removeIp(${idx})">Remove</button>
+        </div>`
+    ).join('');
+}
+
+function addCurrentIp() {
+    const ip = document.getElementById('current-ip').textContent;
+    if (!ip || ip === 'loading…') return;
+    if (pendingIpList.includes(ip)) { alert('Your IP is already in the list.'); return; }
+    pendingIpList.push(ip);
+    renderIpList();
+    showIpSaveRow();
+}
+
+function addIpToList() {
+    const ip = document.getElementById('new-ip').value.trim();
+    if (!ip) return;
+    if (pendingIpList.includes(ip)) { alert('IP already in list.'); return; }
+    pendingIpList.push(ip);
+    document.getElementById('new-ip').value = '';
+    renderIpList();
+    showIpSaveRow();
+}
+
+function removeIp(idx) {
+    pendingIpList.splice(idx, 1);
+    renderIpList();
+    showIpSaveRow();
+}
+
+function showIpSaveRow() {
+    document.getElementById('ip-save-row').style.display = 'block';
+}
+
+function cancelIpEdit() {
+    document.getElementById('ip-save-row').style.display = 'none';
+    document.getElementById('ip-master').value = '';
+    loadSecurity();
+}
+
+async function saveIpList() {
+    const master = document.getElementById('ip-master').value;
+    if (!master) { alert('Master password required.'); return; }
+    const res = await fetch('/api/security', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ masterPassword: master, allowedIps: pendingIpList }),
+    });
+    const data = await res.json();
+    if (!res.ok) { alert('Error: ' + (data.error || 'Failed')); return; }
+    document.getElementById('ip-master').value = '';
+    document.getElementById('ip-save-row').style.display = 'none';
+    alert('IP list saved!');
+    loadSecurity();
+}
+
+async function changePassword() {
+    const master = document.getElementById('sec-master').value;
+    const newPw = document.getElementById('sec-new').value;
+    const confirm = document.getElementById('sec-confirm').value;
+    const msgEl = document.getElementById('sec-msg');
+    msgEl.textContent = '';
+
+    if (!master || !newPw) { msgEl.style.color='#dc3545'; msgEl.textContent='All fields required.'; return; }
+    if (newPw.length < 6) { msgEl.style.color='#dc3545'; msgEl.textContent='Password must be at least 6 characters.'; return; }
+    if (newPw !== confirm) { msgEl.style.color='#dc3545'; msgEl.textContent='Passwords do not match.'; return; }
+
+    const res = await fetch('/api/security', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ masterPassword: master, newPassword: newPw }),
+    });
+    const data = await res.json();
+    if (!res.ok) { msgEl.style.color='#dc3545'; msgEl.textContent='Error: ' + (data.error || 'Failed'); return; }
+
+    msgEl.style.color='#28a745';
+    msgEl.textContent='Password updated! You will be logged out in 3 seconds…';
+    document.getElementById('sec-master').value = '';
+    document.getElementById('sec-new').value = '';
+    document.getElementById('sec-confirm').value = '';
+    setTimeout(() => { location.href = '/login'; }, 3000);
 }
 
 // ── Logs ────────────────────────────────────────

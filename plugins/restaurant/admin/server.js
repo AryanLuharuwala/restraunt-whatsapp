@@ -2,25 +2,257 @@
  * Restaurant admin panel — Express server.
  * Mobile-friendly dashboard + REST API for menu, orders, config.
  * Runs on port 3457 by default.
+ *
+ * Security:
+ *   - Password-based login (SHA-256, stored in auth.json)
+ *   - IP allowlist (stored in auth.json, enforced on every request)
+ *   - Master password to update dashboard password + IP list
+ *   - Session tokens stored in signed cookies (crypto, no extra deps)
  */
 
 const express = require('express');
 const path = require('path');
+const crypto = require('crypto');
+const fs = require('fs');
 const db = require('../db');
 const { logger } = db;
+
+// ── Auth helpers ───────────────────────────────────────
+
+const AUTH_FILE = path.join(__dirname, '..', 'data', 'auth.json');
+
+function loadAuth() {
+    if (!fs.existsSync(AUTH_FILE)) return null;
+    try { return JSON.parse(fs.readFileSync(AUTH_FILE, 'utf8')); } catch { return null; }
+}
+
+function saveAuth(data) {
+    fs.writeFileSync(AUTH_FILE, JSON.stringify(data, null, 2));
+}
+
+function sha256(str) {
+    return crypto.createHash('sha256').update(str).digest('hex');
+}
+
+/** In-memory session store: token → { ip, expiresAt } */
+const sessions = new Map();
+const SESSION_TTL_MS = 8 * 60 * 60 * 1000; // 8 hours
+
+function createSession(ip) {
+    const token = crypto.randomBytes(32).toString('hex');
+    sessions.set(token, { ip, expiresAt: Date.now() + SESSION_TTL_MS });
+    return token;
+}
+
+function getSession(token) {
+    if (!token) return null;
+    const s = sessions.get(token);
+    if (!s) return null;
+    if (Date.now() > s.expiresAt) { sessions.delete(token); return null; }
+    return s;
+}
+
+function parseCookies(header) {
+    const cookies = {};
+    if (!header) return cookies;
+    for (const part of header.split(';')) {
+        const [k, ...v] = part.trim().split('=');
+        if (k) cookies[k.trim()] = decodeURIComponent(v.join('='));
+    }
+    return cookies;
+}
+
+function getRequestIp(req) {
+    // Respect X-Forwarded-For if behind a proxy/ngrok
+    const forwarded = req.headers['x-forwarded-for'];
+    if (forwarded) return forwarded.split(',')[0].trim();
+    return req.socket?.remoteAddress || req.connection?.remoteAddress || '';
+}
+
+function normaliseIp(ip) {
+    // Map IPv4-mapped IPv6 (::ffff:x.x.x.x) → plain IPv4
+    return ip.replace(/^::ffff:/, '');
+}
+
+// ── Auth middleware ────────────────────────────────────
+
+function requireAuth(req, res, next) {
+    const auth = loadAuth();
+
+    // If auth not configured yet, allow through (first-run setup)
+    if (!auth) { return next(); }
+
+    const clientIp = normaliseIp(getRequestIp(req));
+
+    // IP allowlist check (skip if list is empty — open to any IP)
+    const allowedIps = auth.allowedIps || [];
+    if (allowedIps.length > 0 && !allowedIps.includes(clientIp)) {
+        logger.warn('admin: blocked IP', { clientIp, allowedIps });
+        return res.status(403).send('Forbidden: your IP is not allowed.');
+    }
+
+    // Session check
+    const cookies = parseCookies(req.headers.cookie);
+    const session = getSession(cookies.admin_token);
+    if (!session) {
+        // Return 401 JSON for API routes, redirect for page routes
+        if (req.path.startsWith('/api/')) return res.status(401).json({ error: 'Unauthorized' });
+        return res.redirect('/login');
+    }
+
+    next();
+}
+
+// ── Server factory ─────────────────────────────────────
 
 function startAdminServer(bot, opts = {}) {
     const port = opts.port || 3457;
     const app = express();
 
     app.use(express.json());
-    app.use(express.static(path.join(__dirname, 'public')));
 
     function route(method, basePath, handler) {
         app[method](basePath, handler);
         app[method](basePath + '/:branch', handler);
     }
     function getBranch(req) { return req.params.branch || 'main'; }
+
+    // ── Public: Login page ──────────────────────────────
+
+    app.get('/login', (req, res) => {
+        const auth = loadAuth();
+        res.setHeader('Content-Type', 'text/html');
+        res.send(`<!DOCTYPE html><html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Admin Login</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f0f2f5;display:flex;align-items:center;justify-content:center;min-height:100vh;}
+.card{background:#fff;border-radius:12px;padding:32px 24px;width:100%;max-width:360px;box-shadow:0 4px 16px rgba(0,0,0,.12);}
+h1{color:#075e54;font-size:22px;margin-bottom:4px;text-align:center;}
+p{color:#888;font-size:13px;text-align:center;margin-bottom:24px;}
+label{display:block;font-size:13px;font-weight:500;margin-bottom:4px;color:#333;}
+input{width:100%;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:15px;margin-bottom:16px;outline:none;}
+input:focus{border-color:#075e54;}
+button{width:100%;padding:12px;background:#075e54;color:#fff;border:none;border-radius:8px;font-size:15px;font-weight:600;cursor:pointer;}
+button:active{background:#054d44;}
+.err{color:#dc3545;font-size:13px;margin-bottom:12px;text-align:center;}
+${!auth ? '.setup{background:#fff8e1;border:1px solid #ffe082;border-radius:8px;padding:12px;font-size:13px;margin-bottom:16px;color:#795548;}' : ''}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>🍽️ Admin Panel</h1>
+  <p>Restaurant Dashboard</p>
+  ${!auth ? '<div class="setup"><b>First-time setup:</b> Set a password and (optionally) your current IP will be added to the allowlist.</div>' : ''}
+  ${req.query.err === '1' ? '<div class="err">Incorrect password. Try again.</div>' : ''}
+  ${req.query.err === 'ip' ? '<div class="err">Your IP address is not allowed.</div>' : ''}
+  <form method="POST" action="/login">
+    <label>Password</label>
+    <input type="password" name="password" autofocus required>
+    ${!auth ? '<label>Confirm Password</label><input type="password" name="confirm" required>' : ''}
+    <button type="submit">${!auth ? 'Set Password & Enter' : 'Log In'}</button>
+  </form>
+</div>
+</body></html>`);
+    });
+
+    app.post('/login', express.urlencoded({ extended: false }), (req, res) => {
+        const { password, confirm } = req.body;
+        const clientIp = normaliseIp(getRequestIp(req));
+        let auth = loadAuth();
+
+        // First-time setup
+        if (!auth) {
+            if (!password || password.length < 6) return res.redirect('/login?err=1');
+            if (password !== confirm) return res.redirect('/login?err=1');
+            auth = {
+                passwordHash: sha256(password),
+                masterHash: sha256('master:' + password), // master = "master:" + chosen password initially
+                allowedIps: [],
+            };
+            saveAuth(auth);
+            logger.info('admin auth configured', { firstIp: clientIp });
+        }
+
+        // IP check
+        if ((auth.allowedIps || []).length > 0 && !auth.allowedIps.includes(clientIp)) {
+            logger.warn('admin: login blocked (IP)', { clientIp });
+            return res.redirect('/login?err=ip');
+        }
+
+        // Password check
+        if (sha256(password) !== auth.passwordHash) {
+            logger.warn('admin: wrong password', { clientIp });
+            return res.redirect('/login?err=1');
+        }
+
+        const token = createSession(clientIp);
+        res.setHeader('Set-Cookie', `admin_token=${token}; HttpOnly; SameSite=Strict; Path=/; Max-Age=${SESSION_TTL_MS / 1000}`);
+        logger.info('admin: login', { clientIp });
+        res.redirect('/');
+    });
+
+    app.post('/logout', (req, res) => {
+        const cookies = parseCookies(req.headers.cookie);
+        if (cookies.admin_token) sessions.delete(cookies.admin_token);
+        res.setHeader('Set-Cookie', 'admin_token=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0');
+        res.redirect('/login');
+    });
+
+    // ── Auth guard for everything below ─────────────────
+
+    app.use(requireAuth);
+
+    // ── Static (protected) ──────────────────────────────
+
+    app.use(express.static(path.join(__dirname, 'public')));
+
+    // ── Security API ────────────────────────────────────
+
+    /** GET /api/security — returns current IP list + current IP (never exposes passwords) */
+    app.get('/api/security', (req, res) => {
+        const auth = loadAuth() || {};
+        const clientIp = normaliseIp(getRequestIp(req));
+        res.json({ allowedIps: auth.allowedIps || [], currentIp: clientIp });
+    });
+
+    /**
+     * POST /api/security — update password or IP list.
+     * Requires masterPassword in the request body.
+     * Body: { masterPassword, newPassword?, allowedIps? }
+     */
+    app.post('/api/security', (req, res) => {
+        const auth = loadAuth();
+        if (!auth) return res.status(400).json({ error: 'Auth not configured' });
+
+        const { masterPassword, newPassword, allowedIps } = req.body;
+        if (!masterPassword) return res.status(400).json({ error: 'masterPassword required' });
+
+        if (sha256(masterPassword) !== auth.masterHash) {
+            logger.warn('admin: bad master password attempt', { ip: normaliseIp(getRequestIp(req)) });
+            return res.status(403).json({ error: 'Incorrect master password' });
+        }
+
+        if (newPassword !== undefined) {
+            if (!newPassword || newPassword.length < 6) return res.status(400).json({ error: 'Password too short (min 6 chars)' });
+            auth.passwordHash = sha256(newPassword);
+            // Invalidate all sessions after password change
+            sessions.clear();
+            logger.info('admin: password changed');
+        }
+
+        if (allowedIps !== undefined) {
+            if (!Array.isArray(allowedIps)) return res.status(400).json({ error: 'allowedIps must be an array' });
+            auth.allowedIps = allowedIps.map(ip => normaliseIp(ip.trim())).filter(Boolean);
+            logger.info('admin: IP allowlist updated', { ips: auth.allowedIps });
+        }
+
+        saveAuth(auth);
+        res.json({ ok: true, allowedIps: auth.allowedIps });
+    });
 
     // ── Config ──────────────────────────────────────────
 
@@ -122,9 +354,8 @@ function startAdminServer(bot, opts = {}) {
         const order = db.updateOrder(req.params.orderId, req.body, branch);
         if (!order) return res.status(404).json({ error: 'Order not found' });
 
-        // Notify customer on status change via WhatsApp
         if (bot?.client && order.status !== 'pending_payment') {
-            const customerChat = order.chatId || `${order.phone?.replace(/\\D/g, '')}@c.us`;
+            const customerChat = order.chatId || `${order.phone?.replace(/\D/g, '')}@c.us`;
             const messages = {
                 preparing: `👨‍🍳 *Order #${order.token} update*\n\nYour order is now being prepared!`,
                 ready: `🔔 *Your order #${order.token} is ready for pickup!*\n\nPlease come to the counter with your token number.`,
@@ -155,7 +386,6 @@ function startAdminServer(bot, opts = {}) {
 
         logger.info('payment confirmed via dashboard', { token: order.token });
 
-        // Notify customer
         if (bot?.client) {
             const customerChat = order.chatId || (order.phone ? `${order.phone.replace(/\D/g, '')}@c.us` : null);
             if (customerChat) {
@@ -198,7 +428,6 @@ function startAdminServer(bot, opts = {}) {
     // ── Logs ────────────────────────────────────────────
 
     app.get('/api/logs', (req, res) => {
-        const fs = require('fs');
         const logPath = path.join(__dirname, '..', 'data', 'bot.log');
         if (!fs.existsSync(logPath)) return res.json({ lines: [] });
         const content = fs.readFileSync(logPath, 'utf8');
