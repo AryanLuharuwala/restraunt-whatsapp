@@ -42,7 +42,7 @@ class WhatsAppBot {
 
         // QR code trigger
         this.client.on('qr', (qr) => {
-            qrcode.generate(qr, { small: true });
+            qrcode.generate(qr, { small: true }, (code) => process.stdout.write(code + '\n'));
             if (this.events.onQR) this.events.onQR(qr);
         });
 
