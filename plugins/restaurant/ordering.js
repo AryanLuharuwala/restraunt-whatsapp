@@ -155,6 +155,24 @@ async function handleAdminOrderVote(vote, pollInfo, bot) {
         return;
     }
 
+    if (choice === '❌ Cancel') {
+        // Pending payment — customer never paid cash, but may have used store credit at checkout
+        const order = db.findOrderByToken(token, branch);
+        db.updateOrder(orderId, { status: 'cancelled', cancelledAt: new Date().toISOString(), cancelReason: 'admin' }, branch);
+        if (order?.creditApplied > 0) {
+            const creditPhone = customerPhone?.replace(/\D/g, '') || 'unknown';
+            const newBalance = db.addCredit(creditPhone, order.creditApplied, `Refund of store credit for cancelled order #${token}`);
+            logger.info('order cancelled (unpaid), credit refunded', { token, creditRefunded: order.creditApplied, balance: newBalance });
+            try { await bot.client.sendMessage(voterChatId, `❌ Order #${token} cancelled. No payment received. ${config.currency}${order.creditApplied} store credit returned (balance: ${config.currency}${newBalance}).`); } catch {}
+            await notifyCustomer(`⚠️ *Order #${token} has been cancelled.*\n\nYour ${config.currency}${order.creditApplied} store credit has been returned.\nYour balance: *${config.currency}${newBalance}*`);
+        } else {
+            logger.info('order cancelled (unpaid)', { token });
+            try { await bot.client.sendMessage(voterChatId, `❌ Order #${token} cancelled. No payment received.`); } catch {}
+            await notifyCustomer(`⚠️ *Order #${token} has been cancelled.*\n\nNo payment was received. Say *menu* to place a new order.`);
+        }
+        return;
+    }
+
     if (choice === '👨‍🍳 Cooking') {
         db.updateOrder(orderId, { status: 'preparing' }, branch);
         logger.info('order cooking', { token });
@@ -236,12 +254,16 @@ async function handleCheckout({ phone, chatId, send, bot }) {
     await sendAdminOrderPoll(order, session.branch, bot);
 }
 
-async function handleCancel({ chatId, send }) {
+async function handleCancel({ phone, chatId, send }) {
     const session = db.getSession(chatId);
     const pending = db.findPendingByChatId(chatId, session.branch);
     if (pending) {
-        db.updateOrder(pending.id, { status: 'cancelled' }, session.branch);
-        logger.info('order cancelled by customer', { token: pending.token });
+        db.updateOrder(pending.id, { status: 'cancelled', cancelledAt: new Date().toISOString(), cancelReason: 'customer' }, session.branch);
+        // Refund any credit that was applied at checkout
+        if (pending.creditApplied > 0) {
+            db.addCredit(phone, pending.creditApplied, `Refund for cancelled order #${pending.token}`);
+        }
+        logger.info('order cancelled by customer', { token: pending.token, creditRefunded: pending.creditApplied || 0 });
     }
     session.cart = [];
     session.step = 'idle';
@@ -284,7 +306,7 @@ async function sendAdminOrderPoll(order, branch, bot) {
         : db.getAdminsByRole('owner', 'cook');
 
     const pollOptions = isPending
-        ? ['💰 Confirm Payment', '❌ Cancel + Refund']
+        ? ['💰 Confirm Payment', '❌ Cancel']
         : ['👨‍🍳 Cooking', '✅ Ready', '📦 Picked Up', '❌ Cancel + Refund'];
     const pollTitle = isPending
         ? `Order #${order.token} — ${config.currency}${order.amountDue || order.total} (UNPAID)`
@@ -334,7 +356,7 @@ async function handleAdminQueue({ chatId, send, bot }) {
     const pendingPayment = orders.filter(o => o.status === 'pending_payment');
     for (const order of pendingPayment) {
         const poll = new Poll(`Order #${order.token} — ${config.currency}${order.amountDue || order.total} (UNPAID)`,
-            ['💰 Confirm Payment', '❌ Cancel + Refund'], { allowMultipleAnswers: false });
+            ['💰 Confirm Payment', '❌ Cancel'], { allowMultipleAnswers: false });
         const sent = await bot.client.sendMessage(chatId, poll);
         pollMap.set(sent.id.id, { type: 'admin_order', orderId: order.id, token: order.token, branch, adminChatId: chatId, customerChatId: order.chatId, customerPhone: order.phone });
     }

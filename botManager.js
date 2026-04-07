@@ -4,8 +4,23 @@ const fs = require('fs');
 const path = require('path');
 const MessageQueue = require('./messageQueue');
 
+function getDefaultChromiumPath() {
+    if (process.platform === 'win32') {
+        const paths = [
+            path.join(process.env['PROGRAMFILES'] || '', 'Google', 'Chrome', 'Application', 'chrome.exe'),
+            path.join(process.env['PROGRAMFILES(X86)'] || '', 'Google', 'Chrome', 'Application', 'chrome.exe'),
+            path.join(process.env['LOCALAPPDATA'] || '', 'Google', 'Chrome', 'Application', 'chrome.exe'),
+        ];
+        for (const p of paths) {
+            if (fs.existsSync(p)) return p;
+        }
+        return paths[0]; // fallback, will error with a clear message
+    }
+    return '/usr/bin/chromium-browser';
+}
+
 class WhatsAppBot {
-    constructor({ clientId, chromiumPath = '/usr/bin/chromium-browser', logPath, deferInit = false }) {
+    constructor({ clientId, chromiumPath = getDefaultChromiumPath(), logPath, deferInit = false }) {
         this.clientId = clientId;
         this.chromiumPath = chromiumPath;
         this.logPath = logPath || path.join(__dirname, 'logs', `${clientId}.log`);

@@ -56,6 +56,7 @@ module.exports = {
     name: 'restaurant',
     init,
     handler: async (logEntry, msg, bot) => {
+        if (msg.fromMe) return false;
         const chat = await msg.getChat();
         if (chat.isGroup) return false;
 

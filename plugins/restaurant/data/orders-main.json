@@ -174,5 +174,29 @@
     "id": "main-1775410835489-15",
     "status": "pending_payment",
     "createdAt": "2026-04-05T17:40:35.489Z"
+  },
+  {
+    "branch": "main",
+    "phone": "919272400000",
+    "chatId": "136481226100754@lid",
+    "items": [
+      {
+        "id": "paneer-tikka",
+        "name": "Paneer Tikka",
+        "qty": 2,
+        "price": 1
+      }
+    ],
+    "total": 2,
+    "creditApplied": 0,
+    "amountDue": 2,
+    "token": 1,
+    "id": "main-1775579056871-1",
+    "status": "paid",
+    "createdAt": "2026-04-07T16:24:16.871Z",
+    "paidAt": "2026-04-07T16:24:52.845Z",
+    "paymentAmount": 0,
+    "paidVia": "manual_poll",
+    "paidBy": "919647775302@c.us"
   }
 ]

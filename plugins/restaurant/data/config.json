@@ -6,10 +6,11 @@
   ],
   "defaultBranch": "main",
   "adminNumbers": [
-    "919272400000"
+    "919647775302"
   ],
   "roles": {
-    "919272400000": "owner"
+    "919272400000": "owner",
+    "919647775302": "owner"
   },
   "paymentNote": "Please send payment via WhatsApp Pay to confirm your order.",
   "debugMode": true,
