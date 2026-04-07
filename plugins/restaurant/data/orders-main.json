@@ -1,0 +1,178 @@
+[
+  {
+    "branch": "main",
+    "phone": "919272400000",
+    "chatId": "919272400000@c.us",
+    "items": [
+      {
+        "id": "masala-chai",
+        "name": "Masala Chai",
+        "qty": 2,
+        "price": 1
+      }
+    ],
+    "total": 2,
+    "creditApplied": 0,
+    "amountDue": 2,
+    "token": 9,
+    "id": "main-1775405656686-9",
+    "status": "picked_up",
+    "createdAt": "2026-04-05T16:14:16.686Z",
+    "paidAt": "2026-04-05T16:14:48.333Z",
+    "paymentAmount": 0,
+    "paidViaManual": true
+  },
+  {
+    "branch": "main",
+    "phone": "919272400000",
+    "chatId": "919272400000@c.us",
+    "items": [
+      {
+        "id": "cold-coffee",
+        "name": "Cold Coffee",
+        "qty": 5,
+        "price": 2
+      }
+    ],
+    "total": 10,
+    "creditApplied": 0,
+    "amountDue": 10,
+    "token": 10,
+    "id": "main-1775405994301-10",
+    "status": "picked_up",
+    "createdAt": "2026-04-05T16:19:54.301Z",
+    "paidAt": "2026-04-05T16:20:08.445Z",
+    "paymentAmount": 0,
+    "paidViaManual": true,
+    "readyAt": "2026-04-05T16:20:31.273Z",
+    "pickedUpAt": "2026-04-05T16:20:42.536Z"
+  },
+  {
+    "branch": "main",
+    "phone": "919647775302",
+    "chatId": "179143153033403@lid",
+    "items": [
+      {
+        "id": "biryani-veg",
+        "name": "Veg Biryani",
+        "qty": 1,
+        "price": 2
+      },
+      {
+        "id": "paneer-butter",
+        "name": "Paneer Butter Masala",
+        "qty": 1,
+        "price": 1
+      }
+    ],
+    "total": 3,
+    "creditApplied": 0,
+    "amountDue": 3,
+    "token": 11,
+    "id": "main-1775407138518-11",
+    "status": "ready",
+    "createdAt": "2026-04-05T16:38:58.518Z",
+    "paidAt": "2026-04-05T16:39:21.161Z",
+    "paymentAmount": 0,
+    "paidVia": "manual_poll",
+    "paidBy": "919272400000@c.us",
+    "readyAt": "2026-04-05T16:39:37.135Z"
+  },
+  {
+    "branch": "main",
+    "phone": "919272400000",
+    "chatId": "919272400000@c.us",
+    "items": [
+      {
+        "id": "paneer-tikka",
+        "name": "Paneer Tikka",
+        "qty": 1,
+        "price": 1
+      }
+    ],
+    "total": 1,
+    "creditApplied": 0,
+    "amountDue": 1,
+    "token": 12,
+    "id": "main-1775408157232-12",
+    "status": "cancelled",
+    "createdAt": "2026-04-05T16:55:57.232Z",
+    "paidAt": "2026-04-05T16:56:10.521Z",
+    "paymentAmount": 0,
+    "paidVia": "manual_poll",
+    "paidBy": "919272400000@c.us",
+    "cancelledAt": "2026-04-05T16:56:34.078Z",
+    "cancelReason": "admin"
+  },
+  {
+    "branch": "main",
+    "phone": "919272400000",
+    "chatId": "919272400000@c.us",
+    "items": [
+      {
+        "id": "cold-coffee",
+        "name": "Cold Coffee",
+        "qty": 1,
+        "price": 2
+      }
+    ],
+    "total": 2,
+    "creditApplied": 1,
+    "amountDue": 1,
+    "token": 13,
+    "id": "main-1775408212917-13",
+    "status": "cancelled",
+    "createdAt": "2026-04-05T16:56:52.917Z",
+    "cancelledAt": "2026-04-05T16:57:12.369Z",
+    "cancelReason": "admin"
+  },
+  {
+    "branch": "main",
+    "phone": "919272400000",
+    "chatId": "919272400000@c.us",
+    "items": [
+      {
+        "id": "tandoori-roti",
+        "name": "Tandoori Roti",
+        "qty": 2,
+        "price": 1
+      }
+    ],
+    "total": 2,
+    "creditApplied": 2,
+    "amountDue": 0,
+    "token": 14,
+    "id": "main-1775409344646-14",
+    "status": "paid",
+    "createdAt": "2026-04-05T17:15:44.646Z",
+    "paidAt": "2026-04-05T17:15:44.646Z",
+    "paymentAmount": 0,
+    "paidVia": "credit"
+  },
+  {
+    "branch": "main",
+    "phone": "916354830125",
+    "chatId": "224124395905239@lid",
+    "items": [
+      {
+        "id": "dal-makhani",
+        "name": "Dal Makhani",
+        "qty": 1,
+        "price": 1
+      },
+      {
+        "id": "garlic-naan",
+        "name": "Garlic Naan",
+        "qty": 1,
+        "price": 1
+      }
+    ],
+    "total": 2,
+    "creditApplied": 0,
+    "amountDue": 2,
+    "token": 15,
+    "id": "main-1775410835489-15",
+    "status": "pending_payment",
+    "createdAt": "2026-04-05T17:40:35.489Z"
+  }
+]

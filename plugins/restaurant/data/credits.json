@@ -1,0 +1,27 @@
+{
+  "919272400000": {
+    "amount": 0,
+    "history": [
+      {
+        "amount": 1,
+        "reason": "Refund for cancelled order #12",
+        "date": "2026-04-05T16:56:34.078Z"
+      },
+      {
+        "amount": -1,
+        "reason": "Applied to order",
+        "date": "2026-04-05T16:56:52.917Z"
+      },
+      {
+        "amount": 2,
+        "reason": "Refund for cancelled order #13",
+        "date": "2026-04-05T16:57:12.369Z"
+      },
+      {
+        "amount": -2,
+        "reason": "Applied to order",
+        "date": "2026-04-05T17:15:44.646Z"
+      }
+    ]
+  }
+}

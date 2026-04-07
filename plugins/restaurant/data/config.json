@@ -1,0 +1,21 @@
+{
+  "name": "Polly's Restaurant",
+  "currency": "₹",
+  "branches": [
+    "main"
+  ],
+  "defaultBranch": "main",
+  "adminNumbers": [
+    "919272400000"
+  ],
+  "roles": {
+    "919272400000": "owner"
+  },
+  "paymentNote": "Please send payment via WhatsApp Pay to confirm your order.",
+  "debugMode": true,
+  "allowedChats": [
+    "919272400000@c.us"
+  ],
+  "greetingText": null,
+  "greetingImage": "/home/boom/Downloads/WhatsApp Image 2026-04-05 at 10.34.06 PM.jpeg"
+}

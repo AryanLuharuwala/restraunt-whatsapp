@@ -1,0 +1,100 @@
+[2026-04-05T16:36:58.700Z] [INFO] admin panel started on port 3457
+[2026-04-05T16:36:59.198Z] [INFO] vote_update bound (deferred)
+[2026-04-05T16:37:36.373Z] [INFO] greeting sent {"chatId":"179143153033403@lid","phone":"919647775302","categories":4}
+[2026-04-05T16:37:55.763Z] [INFO] cart updated {"chatId":"179143153033403@lid","cart":["Paneer Butter Masala×1"]}
+[2026-04-05T16:38:00.465Z] [INFO] cart updated {"chatId":"179143153033403@lid","cart":["Veg Biryani×1","Paneer Butter Masala×1"]}
+[2026-04-05T16:38:13.064Z] [INFO] qty set {"item":"Paneer Butter Masala","qty":1}
+[2026-04-05T16:38:17.359Z] [INFO] qty set {"item":"Veg Biryani","qty":1}
+[2026-04-05T16:38:41.839Z] [INFO] qty set {"item":"Paneer Butter Masala","qty":1}
+[2026-04-05T16:38:58.544Z] [INFO] order created {"token":11,"total":3,"amountDue":3,"phone":"919647775302","chatId":"179143153033403@lid"}
+[2026-04-05T16:38:59.468Z] [INFO] greeting sent {"chatId":"136481226100754@lid","phone":"919272400000","categories":4}
+[2026-04-05T16:39:21.162Z] [INFO] payment confirmed via poll {"token":11,"by":"919272400000@c.us"}
+[2026-04-05T16:39:22.118Z] [INFO] greeting sent {"chatId":"136481226100754@lid","phone":"919272400000","categories":4}
+[2026-04-05T16:39:37.135Z] [INFO] order ready {"token":11}
+[2026-04-05T16:41:46.781Z] [INFO] greeting sent {"chatId":"179143153033403@lid","phone":"919647775302","categories":4}
+[2026-04-05T16:43:18.920Z] [INFO] admin panel started on port 3457
+[2026-04-05T16:43:19.418Z] [INFO] vote_update bound (deferred)
+[2026-04-05T16:43:28.523Z] [INFO] restaurant bot is live
+[2026-04-05T16:51:24.226Z] [INFO] admin panel started on port 3457
+[2026-04-05T16:51:24.725Z] [INFO] vote_update bound (deferred)
+[2026-04-05T16:51:34.878Z] [INFO] restaurant bot is live
+[2026-04-05T16:54:39.958Z] [INFO] admin panel started on port 3457
+[2026-04-05T16:54:40.456Z] [INFO] vote_update bound (deferred)
+[2026-04-05T16:54:51.233Z] [INFO] restaurant bot is live
+[2026-04-05T16:54:55.620Z] [INFO] debug mode toggled {"debugMode":false,"by":"919272400000"}
+[2026-04-05T16:55:02.863Z] [INFO] debug mode toggled {"debugMode":true,"by":"919272400000"}
+[2026-04-05T16:55:42.870Z] [INFO] greeting sent {"chatId":"919272400000@c.us","phone":"919272400000","categories":4}
+[2026-04-05T16:55:47.587Z] [INFO] cart updated {"chatId":"919272400000@c.us","cart":["Paneer Tikka×1"]}
+[2026-04-05T16:55:50.145Z] [INFO] qty set {"item":"Paneer Tikka","qty":1}
+[2026-04-05T16:55:57.253Z] [INFO] order created {"token":12,"total":1,"amountDue":1,"phone":"919272400000","chatId":"919272400000@c.us"}
+[2026-04-05T16:55:58.542Z] [INFO] greeting sent {"chatId":"136481226100754@lid","phone":"919272400000","categories":4}
+[2026-04-05T16:56:10.522Z] [INFO] payment confirmed via poll {"token":12,"by":"919272400000@c.us"}
+[2026-04-05T16:56:11.406Z] [INFO] greeting sent {"chatId":"136481226100754@lid","phone":"919272400000","categories":4}
+[2026-04-05T16:56:34.079Z] [INFO] order cancelled + refunded {"token":12,"credited":1,"balance":1}
+[2026-04-05T16:56:42.565Z] [INFO] greeting sent {"chatId":"919272400000@c.us","phone":"919272400000","categories":4}
+[2026-04-05T16:56:45.236Z] [INFO] cart updated {"chatId":"919272400000@c.us","cart":["Cold Coffee×1"]}
+[2026-04-05T16:56:49.226Z] [INFO] qty set {"item":"Cold Coffee","qty":1}
+[2026-04-05T16:56:52.935Z] [INFO] order created {"token":13,"total":2,"amountDue":1,"phone":"919272400000","chatId":"919272400000@c.us"}
+[2026-04-05T16:56:53.798Z] [INFO] greeting sent {"chatId":"136481226100754@lid","phone":"919272400000","categories":4}
+[2026-04-05T16:57:02.082Z] [INFO] order updated via dashboard {"orderId":"main-1775408212917-13","status":"cancelled"}
+[2026-04-05T16:57:12.369Z] [INFO] order cancelled + refunded {"token":13,"credited":2,"balance":2}
+[2026-04-05T17:03:23.421Z] [INFO] order updated via dashboard {"orderId":"main-1775405656686-9","status":"ready"}
+[2026-04-05T17:03:34.127Z] [INFO] order updated via dashboard {"orderId":"main-1775405656686-9","status":"picked_up"}
+[2026-04-05T17:04:38.379Z] [INFO] greeting sent {"chatId":"919272400000@c.us","phone":"919272400000","categories":4}
+[2026-04-05T17:07:04.271Z] [INFO] item updated {"branch":"main","item":"Paneer Tikka"}
+[2026-04-05T17:15:02.734Z] [INFO] admin panel started on port 3457
+[2026-04-05T17:15:03.232Z] [INFO] vote_update bound (deferred)
+[2026-04-05T17:15:12.647Z] [INFO] restaurant bot is live
+[2026-04-05T17:15:25.538Z] [INFO] greeting sent {"chatId":"919272400000@c.us","phone":"919272400000","categories":4}
+[2026-04-05T17:15:38.000Z] [INFO] cart updated {"chatId":"919272400000@c.us","cart":["Tandoori Roti×1"]}
+[2026-04-05T17:15:40.758Z] [INFO] qty set {"item":"Tandoori Roti","qty":2}
+[2026-04-05T17:15:44.666Z] [INFO] order created {"token":14,"total":2,"amountDue":0,"phone":"919272400000","chatId":"919272400000@c.us"}
+[2026-04-05T17:15:45.600Z] [INFO] greeting sent {"chatId":"136481226100754@lid","phone":"919272400000","categories":4}
+[2026-04-05T17:39:05.926Z] [INFO] chat whitelisted {"chatId":"919272400000@c.us","by":"919272400000"}
+[2026-04-05T17:40:01.932Z] [INFO] debug mode toggled {"debugMode":false,"by":"919272400000"}
+[2026-04-05T17:40:08.095Z] [INFO] greeting sent {"chatId":"224124395905239@lid","phone":"916354830125","categories":4}
+[2026-04-05T17:40:24.439Z] [INFO] cart updated {"chatId":"224124395905239@lid","cart":["Dal Makhani×1"]}
+[2026-04-05T17:40:26.382Z] [INFO] cart updated {"chatId":"224124395905239@lid","cart":["Dal Makhani×1","Garlic Naan×1"]}
+[2026-04-05T17:40:29.250Z] [INFO] qty set {"item":"Garlic Naan","qty":1}
+[2026-04-05T17:40:30.372Z] [INFO] qty set {"item":"Dal Makhani","qty":1}
+[2026-04-05T17:40:35.831Z] [INFO] order created {"token":15,"total":2,"amountDue":2,"phone":"916354830125","chatId":"224124395905239@lid"}
+[2026-04-05T17:40:36.750Z] [INFO] greeting sent {"chatId":"136481226100754@lid","phone":"919272400000","categories":4}
+[2026-04-05T17:41:09.816Z] [INFO] debug mode toggled {"debugMode":true,"by":"919272400000"}
+[2026-04-06T16:34:39.410Z] [INFO] admin panel started on port 3457
+[2026-04-06T16:34:39.904Z] [INFO] vote_update bound (deferred)
+[2026-04-06T16:35:09.062Z] [INFO] admin panel started on port 3457
+[2026-04-06T16:35:09.556Z] [INFO] vote_update bound (deferred)
+[2026-04-06T16:35:42.446Z] [INFO] admin panel started on port 3457
+[2026-04-06T16:35:42.938Z] [INFO] vote_update bound (deferred)
+[2026-04-06T16:35:54.261Z] [INFO] admin panel started on port 3457
+[2026-04-06T16:35:54.756Z] [INFO] vote_update bound (deferred)
+[2026-04-06T16:36:42.807Z] [ERROR] unhandled rejection {"error":"net::ERR_NETWORK_CHANGED at https://web.whatsapp.com/"}
+[2026-04-06T16:37:29.896Z] [INFO] admin panel started on port 3457
+[2026-04-06T16:37:30.389Z] [INFO] vote_update bound (deferred)
+[2026-04-06T16:38:13.618Z] [INFO] admin panel started on port 3457
+[2026-04-06T16:38:14.111Z] [INFO] vote_update bound (deferred)
+[2026-04-06T16:38:19.765Z] [ERROR] unhandled rejection {"error":"net::ERR_NETWORK_CHANGED at https://web.whatsapp.com/"}
+[2026-04-06T16:40:48.533Z] [INFO] admin panel started on port 3457
+[2026-04-06T16:40:49.028Z] [INFO] vote_update bound (deferred)
+[2026-04-06T16:41:37.580Z] [ERROR] unhandled rejection {"error":"auth timeout"}
+[2026-04-06T16:42:49.390Z] [INFO] admin panel started on port 3457
+[2026-04-06T16:42:49.883Z] [INFO] vote_update bound (deferred)
+[2026-04-06T16:42:56.925Z] [ERROR] unhandled rejection {"error":"net::ERR_NETWORK_CHANGED at https://web.whatsapp.com/"}
+[2026-04-06T16:44:03.164Z] [INFO] admin panel started on port 3457
+[2026-04-06T16:44:03.657Z] [INFO] vote_update bound (deferred)
+[2026-04-06T16:44:08.189Z] [ERROR] unhandled rejection {"error":"net::ERR_NAME_NOT_RESOLVED at https://web.whatsapp.com/"}
+[2026-04-06T16:45:59.709Z] [INFO] admin panel started on port 3457
+[2026-04-06T16:46:00.202Z] [INFO] vote_update bound (deferred)
+[2026-04-06T16:46:36.946Z] [ERROR] unhandled rejection {"error":"net::ERR_CONNECTION_RESET at https://web.whatsapp.com/"}
+[2026-04-06T16:47:42.793Z] [INFO] admin panel started on port 3457
+[2026-04-06T16:47:43.286Z] [INFO] vote_update bound (deferred)
+[2026-04-06T16:48:40.329Z] [ERROR] unhandled rejection {"error":"auth timeout"}
+[2026-04-06T17:56:20.652Z] [INFO] admin panel started on port 3457
+[2026-04-06T17:56:21.147Z] [INFO] vote_update bound (deferred)
+[2026-04-06T17:56:24.199Z] [ERROR] unhandled rejection {"error":"net::ERR_NETWORK_CHANGED at https://web.whatsapp.com/"}
+[2026-04-06T17:57:57.259Z] [INFO] admin panel started on port 3457
+[2026-04-06T17:57:57.752Z] [INFO] vote_update bound (deferred)
+[2026-04-06T17:58:15.802Z] [INFO] admin panel started on port 3457
+[2026-04-06T17:58:16.296Z] [INFO] vote_update bound (deferred)
+[2026-04-07T12:10:58.062Z] [INFO] admin panel started on port 3457
+[2026-04-07T12:10:58.559Z] [INFO] vote_update bound (deferred)
